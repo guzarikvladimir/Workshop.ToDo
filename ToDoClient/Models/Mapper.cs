@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ToDoClient.Models;
+﻿using ToDoClient.Models;
 using todoclient.ORM;
 
 namespace todoclient.Models

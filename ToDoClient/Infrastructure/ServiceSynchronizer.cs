@@ -1,8 +1,5 @@
 ﻿using Services;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ToDoClient.Services;
 using ToDoClient.Models;
 using todoclient.Models;

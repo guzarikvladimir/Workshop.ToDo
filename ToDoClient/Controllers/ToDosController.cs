@@ -6,8 +6,6 @@ using System.Web.Http;
 using todoclient.ORM;
 using ToDoClient.Models;
 using ToDoClient.Services;
-using System;
-using todoclient.Infrastructure;
 using todoclient.Models;
 
 namespace ToDoClient.Controllers
@@ -50,9 +48,14 @@ namespace ToDoClient.Controllers
         /// <param name="id">The todo item identifier.</param>
         public void Delete(int id)
         {
-            int todoId = tododbService.GetByUserId(userService.GetOrCreateUser()).FirstOrDefault(x => x.Id == id).ToDoId;
-            tododbService.Delete(id);
-            Task.Run(() => todoService.DeleteItem(todoId));
+            var userId = userService.GetOrCreateUser();
+            var todo = tododbService.GetByUserId(userId).FirstOrDefault(x => x.Id == id);
+            if (todo != null)
+            {
+                int todoId = todo.ToDoId;
+                tododbService.Delete(id);
+                Task.Run(() => todoService.DeleteItem(todoId));
+            }
         }
 
         /// <summary>
@@ -73,8 +76,11 @@ namespace ToDoClient.Controllers
                 {
                     var itemdb = tododbService.GetByUserId(todo.UserId).FirstOrDefault(x => x.Name == todo.Name);
                     var itemCloud = todoService.GetItems(todo.UserId).FirstOrDefault(x => x.Name.Contains(itemdb.Name));
-                    itemdb.ToDoId = itemCloud.ToDoId;
-                    tododbService.UpdateTodoId(itemdb.Id, itemCloud.ToDoId);
+                    if (itemCloud != null)
+                    {
+                        itemdb.ToDoId = itemCloud.ToDoId;
+                        tododbService.UpdateTodoId(itemdb.Id, itemCloud.ToDoId);
+                    }
                 });
         }
     }
