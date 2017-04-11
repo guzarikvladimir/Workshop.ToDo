@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http;
 using todoclient.Infrastructure;
 
@@ -9,18 +10,15 @@ namespace todoclient
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            Synchronize();
+            Task.Run(() => Synchronize());
         }
 
         private void Synchronize()
         {
             var synch = new ServiceSynchronizer();
-            Task.Run(() => synch.SynchId())
-                .ContinueWith((unusedArg) =>
-                {
-                    synch.DeleteMissing();
-                    synch.UploadMissing();
-                });
+            synch.SynchId();
+            synch.DeleteMissing();
+            synch.UploadMissing();
         }
     }
 }
