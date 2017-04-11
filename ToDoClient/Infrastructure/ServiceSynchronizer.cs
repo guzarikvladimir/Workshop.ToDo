@@ -1,4 +1,5 @@
-﻿using Services;
+﻿using System.Data.Entity;
+using Services;
 using System.Linq;
 using ToDoClient.Services;
 using ToDoClient.Models;
@@ -72,6 +73,22 @@ namespace todoclient.Infrastructure
             }
         }
 
-        
+        public void SynchId()
+        {
+            int userId = userService.GetOrCreateUser();
+            var itemsDB = tododbService.GetByUserId(userId)
+                .Where(x => x.UserId == 0)
+                .AsNoTracking().ToList()
+                .Select(x => x.ToMVC());
+            var itemsCloud = todoService.GetItems(userId).ToList();
+            foreach (ToDoItemViewModel item in itemsDB)
+            {
+                var todo = itemsCloud.FirstOrDefault(x => x.Name.Contains(item.Name));
+                if (todo != null)
+                {
+                    tododbService.UpdateTodoId(item.Id, todo.ToDoId);
+                }
+            }
+        }
     }
 }
