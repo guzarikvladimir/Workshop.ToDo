@@ -1,0 +1,17 @@
+﻿.break-words {
+    word-wrap: break-word;
+}
+
+.completed {
+    text-decoration: overline;
+    color: #c0c0c0;
+}
+
+input[type="checkbox"]:checked + td{
+	text-decoration: line-through;
+	color: rgba(0,0,0,.3);
+}
+
+input[type="checkbox"]:checked + .break-words{
+    color: red;
+}

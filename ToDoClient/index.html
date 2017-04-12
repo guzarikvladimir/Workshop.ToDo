@@ -5,28 +5,27 @@
     <meta charset="utf-8"/>
     
     <link rel="stylesheet" type="text/css" href="Styles/site.css">
-
+    <link href="Content/style.css" rel="stylesheet" />
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
     <script src="Scripts/jquery-3.1.0.js" language="javascript"></script>
     <script src="Scripts/todo.js" language="javascript"></script>
 </head>
 <body>
-    <table id="tasks">
-        <thead>
-            <tr>
-                <th>Completed</th>
-                <th>Task</th>
-                <th>Actions</th>
-            </tr>
-            <!-- The row for creating new items. -->
-            <tr id="new">
-                <td><input type='checkbox' id="newCompleted" /></td>
-                <td><input type='text' id="newName" /></td>
-                <td><input type='button' id="newCreate" value='Create' /></td>
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
+<table class="table table-striped" style="width: 400px; margin: auto;" id="tasks">
+    <thead>
+    <tr>
+        <th>Completed</th>
+        <th>Task</th>
+        <th>Actions</th>
+    </tr>
+    <tr id="new">
+        <td><input type='checkbox' id="newCompleted"/></td>
+        <td><input type='text' id="newName" class="form-control input-sm"/></td>
+        <td><input type='button' id="newCreate" class="btn btn-default btn-sm" value='Create'/></td>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 </body>
 </html>
