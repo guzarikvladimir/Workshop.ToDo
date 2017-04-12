@@ -12,6 +12,11 @@ namespace Services
     {
         private readonly DbContext context = new todoclientdb();
 
+        public IEnumerable<int> GetUsers()
+        {
+            return context.Set<ToDo>().Select(x => x.UserId).ToArray();
+        }
+
         public IQueryable<ToDo> GetByUserId(int userId)
         {
             return context.Set<ToDo>().Where(x => x.UserId == userId).AsNoTracking();
@@ -42,6 +47,13 @@ namespace Services
         {
             var todo = context.Set<ToDo>().FirstOrDefault(x => x.Id == modelId);
             todo.ToDoId = todoId;
+            context.SaveChanges();
+        }
+
+        public void MarkAsNeedToDelete(int modelId)
+        {
+            var todo = context.Set<ToDo>().FirstOrDefault(x => x.Id == modelId);
+            todo.IsNeedToDelete = true;
             context.SaveChanges();
         }
     }

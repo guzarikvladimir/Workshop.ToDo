@@ -4,6 +4,7 @@ using System.Linq;
 using ToDoClient.Services;
 using ToDoClient.Models;
 using todoclient.Models;
+using todoclient.ORM;
 
 namespace todoclient.Infrastructure
 {
@@ -73,20 +74,45 @@ namespace todoclient.Infrastructure
             }
         }
 
-        public void SynchId()
+        public void Synchronize()
         {
-            int userId = userService.GetOrCreateUser();
-            var itemsDB = tododbService.GetByUserId(userId)
-                .Where(x => x.UserId == 0)
-                .AsNoTracking().ToList()
-                .Select(x => x.ToMVC());
-            var itemsCloud = todoService.GetItems(userId).ToList();
-            foreach (ToDoItemViewModel item in itemsDB)
+            var users = tododbService.GetUsers();
+            foreach (int userId in users)
             {
-                var todo = itemsCloud.FirstOrDefault(x => x.Name.Contains(item.Name));
-                if (todo != null)
+                var dbCol = tododbService.GetByUserId(userId).ToList();
+                var cloudCol = todoService.GetItems(userId);
+                foreach (ToDo item in dbCol)
                 {
-                    tododbService.UpdateTodoId(item.Id, todo.ToDoId);
+                    if (!item.IsNeedToDelete && item.ToDoId == 0)
+                    {
+                        int todoId;
+                        if (!cloudCol.Any(x => x.UserId == userId && x.Name.Contains(item.Name)))
+                        {
+                            todoService.CreateItem(item.ToCloud());
+                            todoId = todoService.GetItems(userId).FirstOrDefault(x => x.Name.Contains(item.Name)).ToDoId;
+                        }
+                        else
+                        {
+                            todoId = cloudCol.FirstOrDefault(x => x.UserId == userId && x.Name.Contains(item.Name)).ToDoId;
+                        }
+                        tododbService.UpdateTodoId(item.Id, todoId);
+                    }
+                    else if (item.IsNeedToDelete)
+                    {
+                        if (item.ToDoId != 0)
+                        {
+                            todoService.DeleteItem(item.ToDoId);
+                        }
+                        else
+                        {
+                            if (cloudCol.Any(x => x.UserId == userId && x.Name.Contains(item.Name)))
+                            {
+                                int todoId = cloudCol.FirstOrDefault(x => x.UserId == userId && x.Name.Contains(item.Name)).ToDoId;
+                                todoService.DeleteItem(todoId);
+                            }
+                        }
+                        tododbService.Delete(item.Id);
+                    }
                 }
             }
         }

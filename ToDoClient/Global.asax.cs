@@ -10,6 +10,8 @@ namespace todoclient
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            var synch = new ServiceSynchronizer();
+            Task.Run(() => synch.Synchronize());
         }
     }
 }

@@ -9,15 +9,17 @@ namespace todoclient.ORM
     [Table("ToDos")]
     public partial class ToDo
     {
+        public int Id { get; set; }
+
         public int ToDoId { get; set; }
 
         public int UserId { get; set; }
 
-        public bool IsCompleted { get; set; }
-
         [Required]
         public string Name { get; set; }
 
-        public int Id { get; set; }
+        public bool IsCompleted { get; set; }
+
+        public bool IsNeedToDelete { get; set; }
     }
 }

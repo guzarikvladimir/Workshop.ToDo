@@ -26,8 +26,26 @@ namespace ToDoClient.Controllers
         public IEnumerable<ToDoItemViewModel> Get()
         {
             var userId = userService.GetOrCreateUser();
-            return tododbService.GetByUserId(userId).ToList()
+            var needToDelete = tododbService.GetByUserId(userId)
+                .Where(x => x.IsNeedToDelete).ToList();
+            if (needToDelete.Count != 0)
+            {
+                Task.Run(() => DeferredDeleting(needToDelete));
+            }
+            return tododbService.GetByUserId(userId)
+                .Where(x => !x.IsNeedToDelete).ToList()
                 .Select(todo => todo.ToMVC());
+        }
+
+        private void DeferredDeleting(IEnumerable<ToDo> dbCol)
+        {
+            foreach (ToDo todo in dbCol)
+            {
+                if (todo.ToDoId != 0)
+                {
+                    todoService.DeleteItem(todo.ToDoId);
+                }
+            }
         }
 
         /// <summary>
@@ -53,8 +71,12 @@ namespace ToDoClient.Controllers
             if (todo != null)
             {
                 int todoId = todo.ToDoId;
-                tododbService.Delete(id);
-                Task.Run(() => todoService.DeleteItem(todoId));
+                tododbService.MarkAsNeedToDelete(id);
+                if (todoId != 0)
+                {
+                    Task.Run(() => todoService.DeleteItem(todoId))
+                       .ContinueWith((unusedArg) => tododbService.Delete(id));
+                }
             }
         }
 

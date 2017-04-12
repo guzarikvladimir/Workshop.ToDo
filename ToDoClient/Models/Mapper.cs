@@ -13,7 +13,8 @@ namespace todoclient.Models
                 ToDoId = todo.ToDoId,
                 UserId = todo.UserId,
                 Name = todo.Name,
-                IsCompleted = todo.IsCompleted
+                IsCompleted = todo.IsCompleted,
+                IsNeedToDelete = todo.IsNeedToDelete
             };
         }
 
